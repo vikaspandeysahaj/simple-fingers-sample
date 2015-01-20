@@ -1,5 +1,7 @@
 package com.neurotec.samples;
 
+import com.neurotec.samples.panels.MainPanel;
+
 import javax.swing.*;
 import java.applet.Applet;
 import java.awt.*;
@@ -33,16 +35,14 @@ public class SimpleFingersApplication extends Applet {
                 public void run() {
 
                     JFrame frame = new JFrame();
-                    frame.setTitle("Simple Fingers Sample");
+                    frame.setTitle("Muzima Fingerprint Identification");
                     MainPanel panel = new MainPanel();
                     frame.add(panel);
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     frame.pack();
-                    frame.setLocationRelativeTo(null);
+                    //frame.setLocationRelativeTo(null);
                     frame.setVisible(true);
                     add(frame);
-
-
                 }
             });
         } catch (InterruptedException e) {
