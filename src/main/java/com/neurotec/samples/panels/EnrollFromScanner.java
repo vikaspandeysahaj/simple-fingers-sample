@@ -14,7 +14,6 @@ import com.neurotec.samples.services.FingerPrintService;
 import com.neurotec.samples.settings.FingersTools;
 import com.neurotec.samples.util.Utils;
 import com.neurotec.util.concurrent.CompletionHandler;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.json.JSONException;
 
 import javax.swing.*;
@@ -23,6 +22,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.xml.bind.DatatypeConverter;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -52,6 +52,7 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
     private JButton btnForce;
     private JButton btnRefresh;
     private JButton btnIdentifyPatient;
+    private JButton btnRegisterPatient;
     private JButton btnScan;
     private JCheckBox cbAutomatic;
     private JCheckBox cbShowProcessed;
@@ -93,10 +94,6 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         deviceManager.initialize();
 
     }
-
-    // ===========================================================
-    // Private methods
-    // ===========================================================
 
     private void startCapturing() {
         lblInfo.setText("");
@@ -145,7 +142,9 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
             service.updatePatientListView(patient);
         }
         else {
+            btnRegisterPatient.setEnabled(true);
             JOptionPane.showMessageDialog(this, "Patient Not Found", "Identification", JOptionPane.PLAIN_MESSAGE);
+
         }
     }
 
@@ -185,7 +184,7 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
     }
 
     private NTemplate createTemplate(String fingerPrintTemplateString) {
-        byte[] templateBuffer = Base64.decode(fingerPrintTemplateString);
+        byte[] templateBuffer = DatatypeConverter.parseBase64Binary(fingerPrintTemplateString);//Base64.decode(fingerPrintTemplateString);
         return new NTemplate(new NBuffer(templateBuffer));
     }
 
@@ -220,9 +219,6 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         }
     }
 
-    // ===========================================================
-    // Package private methods
-    // ===========================================================
 
     void updateStatus(String status) {
         lblInfo.setText(status);
@@ -236,9 +232,6 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         return (NFingerScanner) scannerList.getSelectedValue();
     }
 
-    // ===========================================================
-    // Protected methods
-    // ===========================================================
 
     @Override
     protected void initGUI() {
@@ -258,6 +251,7 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         lblInfo = new JLabel();
         panelSave = new JPanel();
         btnIdentifyPatient = new JButton();
+        btnRegisterPatient = new JButton();
         cbShowProcessed = new JCheckBox();
 
         setLayout(new BorderLayout());
@@ -316,6 +310,10 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         btnIdentifyPatient.setEnabled(false);
         panelSave.add(btnIdentifyPatient);
 
+        btnRegisterPatient.setText("Register Patient");
+        btnRegisterPatient.setEnabled(false);
+        panelSave.add(btnRegisterPatient);
+
         cbShowProcessed.setSelected(true);
         cbShowProcessed.setText("Show processed image");
         panelSave.add(cbShowProcessed);
@@ -351,6 +349,7 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         btnCancel.addActionListener(this);
         btnForce.addActionListener(this);
         btnIdentifyPatient.addActionListener(this);
+        btnRegisterPatient.addActionListener(this);
         cbShowProcessed.addActionListener(this);
         scannerList.addListSelectionListener(new ScannerSelectionListener());
     }
@@ -369,6 +368,7 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         btnIdentifyPatient.setEnabled(!scanning && (subject != null) && (subject.getStatus() == NBiometricStatus.OK));
         cbShowProcessed.setEnabled(!scanning);
         cbAutomatic.setEnabled(!scanning);
+        btnRegisterPatient.setEnabled(false);
     }
 
     @Override
@@ -377,10 +377,6 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         FingersTools.getInstance().getClient().setUseDeviceManager(true);
         FingersTools.getInstance().getClient().setFingersReturnProcessedImage(true);
     }
-
-    // ===========================================================
-    // Public methods
-    // ===========================================================
 
     public void updateScannerList() {
         DefaultListModel model = (DefaultListModel) scannerList.getModel();
@@ -400,10 +396,6 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
         FingersTools.getInstance().getClient().cancel();
     }
 
-    // ===========================================================
-    // Event handling
-    // ===========================================================
-
     @Override
     public void actionPerformed(ActionEvent ev) {
         try {
@@ -419,17 +411,16 @@ public final class EnrollFromScanner extends BasePanel implements ActionListener
                 identifyPatient();
             } else if (ev.getSource() == cbShowProcessed) {
                 updateShownImage();
+            } else if(ev.getSource() == btnRegisterPatient){
+
+                String template = DatatypeConverter.printBase64Binary(subject.getTemplateBuffer().toByteArray());
+                service.callRegisterPatientJavaScriptFunction(template);
             }
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // ===========================================================
-    // Inner classes
-    // ===========================================================
-
 
     private class CaptureCompletionHandler implements CompletionHandler<NBiometricTask, Object> {
 

@@ -1,5 +1,6 @@
 package com.neurotec.samples.settings;
 
+import com.neurotec.biometrics.NMatchingSpeed;
 import com.neurotec.biometrics.client.NBiometricClient;
 import com.neurotec.licensing.NLicense;
 
@@ -49,6 +50,8 @@ public final class FingersTools {
 	private FingersTools() {
 		licenses = new HashMap<String, Boolean>();
 		client = new NBiometricClient();
+        client.setMatchingThreshold(48);
+        client.setFingersMatchingSpeed(NMatchingSpeed.LOW);
 		defaultClient = new NBiometricClient();
 	}
 

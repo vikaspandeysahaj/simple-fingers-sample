@@ -32,6 +32,10 @@ public class FingerPrintService {
         callUpdatePatientListJavaScriptFunction(patient);
     }
 
+    public void RegisterPatient(String fingerprintData) {
+        callRegisterPatientJavaScriptFunction(fingerprintData);
+    }
+
     //to converter class
 
     private List<PatientFingerPrintModel> PatientFingerPrintModelBuilder(String jsonPatients) throws JSONException {
@@ -71,6 +75,16 @@ public class FingerPrintService {
         try {
             JSObject window = JSObject.getWindow(applet);
             window.call("updatePatientList", new Object[] {patient.getId(), patient.getGivenName(), patient.getFamilyName(), patient.getGender()});
+        } catch (JSException jse) {
+            jse.printStackTrace();
+        }
+    }
+
+    public void callRegisterPatientJavaScriptFunction(String fingerprintData)
+    {
+        try {
+            JSObject window = JSObject.getWindow(applet);
+            window.call("RegisterPatient", new Object[] {fingerprintData});
         } catch (JSException jse) {
             jse.printStackTrace();
         }

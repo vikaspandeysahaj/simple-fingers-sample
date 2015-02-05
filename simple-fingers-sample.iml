@@ -22,7 +22,7 @@
     <orderEntry type="module-library">
       <library name="Maven: sun.jdk:plugin:1.6.0">
         <CLASSES>
-          <root url="jar:///System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/lib/plugin.jar!/" />
+          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/jre/lib/plugin.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
